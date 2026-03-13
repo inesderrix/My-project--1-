@@ -6,7 +6,6 @@ public class PlayerMouvement : MonoBehaviour
     [Header("Paramètres de mouvement")]
     [SerializeField] private float vitesse = 5f;
 
-    // Noms des actions (en constantes)
     private const string MOVE_ACTION = "Move";
 
     private SpriteRenderer spriteRenderer;
@@ -31,25 +30,15 @@ public class PlayerMouvement : MonoBehaviour
             animator = GetComponentInChildren<Animator>();
         }
 
-        // Récupère le Player Input
+
         playerInput = GetComponent<PlayerInput>();
 
-        // Cherche l'action "Move" avec la constante
         moveAction = playerInput.actions.FindAction(MOVE_ACTION);
 
-        if (moveAction == null)
-        {
-            Debug.LogError($"Action '{MOVE_ACTION}' introuvable dans Input Actions !");
-        }
-        else
-        {
-            Debug.Log($"✅ Action '{MOVE_ACTION}' trouvée et liée !");
-        }
     }
 
     void Update()
     {
-        // Lit la valeur de l'action directement
         if (moveAction != null)
         {
             moveInput = moveAction.ReadValue<Vector2>();

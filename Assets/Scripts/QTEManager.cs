@@ -34,8 +34,9 @@ public class CameraRepairSystem : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
+        {
             audioSource = gameObject.AddComponent<AudioSource>();
-
+        }
         playerInput = FindObjectOfType<PlayerInput>();
 
 
@@ -43,122 +44,132 @@ public class CameraRepairSystem : MonoBehaviour
         nextFailureTime = Time.time + intervalBetweenFailures;
 
         if (qteCamera != null)
+        {
             qteCamera.enabled = true;
+        }
 
         if (qteCanvas != null)
+        {
             qteCanvas.gameObject.SetActive(false);
+        }
+    }
 
-
-        void Update()
+    void Update()
+    {
+        if (!repairInProgress && Time.time >= nextFailureTime)
         {
-            if (!repairInProgress && Time.time >= nextFailureTime)
-            {
-                BreakRandomCamera();
-            }
+            BreakRandomCamera();
+        }
 
-            if (repairInProgress)
+        if (repairInProgress)
+        {
+            CheckInput();
+        }
+    }
+
+    void BreakRandomCamera()
+    {
+        if (plateauCameras.Length == 0) return;
+
+        List<Camera> activeCameras = new List<Camera>();
+        foreach (Camera cam in plateauCameras)
+        {
+            if (cam != null && cam.enabled)
+                activeCameras.Add(cam);
+        }
+
+        if (activeCameras.Count == 0) return;
+
+        int randomIndex = Random.Range(0, activeCameras.Count);
+        brokenCamera = activeCameras[randomIndex];
+        brokenCamera.enabled = false;
+
+        repairInProgress = true;
+        currentIndex = 0;
+
+        if (qteCanvas != null)
+        {
+            qteCanvas.gameObject.SetActive(true);
+            UpdateQTEDisplay();
+        }
+
+        if (cameraFailSound != null)
+        {
+            audioSource.clip = cameraFailSound;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
+    }
+
+    void CheckInput()
+    {
+        if (playerInput == null) return;
+
+        string expectedKey = repairSequence[currentIndex];
+
+        if (playerInput.actions[$"Button{expectedKey}"].WasPressedThisFrame())
+        {
+            currentIndex++;
+
+            UpdateQTEDisplay();
+
+            if (currentIndex >= repairSequence.Count)
             {
-                CheckInput();
+                RepairCamera();
+            }
+        }
+    }
+
+    void RepairCamera()
+    {
+        if (brokenCamera != null)
+        {
+            brokenCamera.enabled = true;
+            brokenCamera = null;
+        }
+
+        repairInProgress = false;
+        currentIndex = 0;
+
+        if (qteCanvas != null)
+        {
+            qteCanvas.gameObject.SetActive(false);
+        }
+
+        nextFailureTime = Time.time + intervalBetweenFailures;
+        audioSource.Stop();
+    }
+
+    void UpdateQTEDisplay()
+    {
+
+        if (codeText == null)
+        {
+            return;
+        }
+
+        string displayText = "";
+        for (int i = 0; i < repairSequence.Count; i++)
+        {
+            if (i < currentIndex)
+            {
+                displayText += $"<color=green>{repairSequence[i]}</color> ";
+            }
+            else if (i == currentIndex)
+            {
+                displayText += $"<color=yellow>{repairSequence[i]}</color> ";
+            }
+            else
+            {
+                displayText += $"<color=white>{repairSequence[i]}</color> ";
             }
         }
 
-        void BreakRandomCamera()
+        codeText.text = displayText;
+
+        if (infoText != null)
         {
-            if (plateauCameras.Length == 0) return;
-
-            List<Camera> activeCameras = new List<Camera>();
-            foreach (Camera cam in plateauCameras)
-            {
-                if (cam != null && cam.enabled)
-                    activeCameras.Add(cam);
-            }
-
-            if (activeCameras.Count == 0) return;
-
-            int randomIndex = Random.Range(0, activeCameras.Count);
-            brokenCamera = activeCameras[randomIndex];
-            brokenCamera.enabled = false;
-
-            repairInProgress = true;
-            currentIndex = 0;
-
-            if (qteCanvas != null)
-            {
-                qteCanvas.gameObject.SetActive(true);
-                UpdateQTEDisplay();
-            }
-
-            if (cameraFailSound != null)
-                audioSource.PlayOneShot(cameraFailSound);
-        }
-
-        void CheckInput()
-        {
-            if (playerInput == null) return;
-
-            string expectedKey = repairSequence[currentIndex];
-
-            if (playerInput.actions[$"Button{expectedKey}"].WasPressedThisFrame())
-            {
-                currentIndex++;
-
-                UpdateQTEDisplay();
-
-                if (currentIndex >= repairSequence.Count)
-                {
-                    RepairCamera();
-                }
-            }
-        }
-
-        void RepairCamera()
-        {
-            if (brokenCamera != null)
-            {
-                brokenCamera.enabled = true;
-                brokenCamera = null;
-            }
-
-            repairInProgress = false;
-            currentIndex = 0;
-
-            if (qteCanvas != null)
-                qteCanvas.gameObject.SetActive(false);
-
-            nextFailureTime = Time.time + intervalBetweenFailures;
-        }
-
-        void UpdateQTEDisplay()
-        {
-
-            if (codeText == null)
-            {
-                return;
-            }
-
-            string displayText = "";
-            for (int i = 0; i < repairSequence.Count; i++)
-            {
-                if (i < currentIndex)
-                {
-                    displayText += $"<color=green>{repairSequence[i]}</color> ";
-                }
-                else if (i == currentIndex)
-                {
-                    displayText += $"<color=yellow>{repairSequence[i]}</color> ";
-                }
-                else
-                {
-                    displayText += $"<color=white>{repairSequence[i]}</color> ";
-                }
-            }
-
-            codeText.text = displayText;
-
-            if (infoText != null)
-            {
-                infoText.text = "CAMÉRA EN PANNE - ENTREZ LE CODE";
-            }
+            infoText.text = "CAMÉRA EN PANNE - ENTREZ LE CODE";
         }
     }
 

@@ -1,114 +1,100 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
 
 public class KatanaComboSystem : MonoBehaviour
 {
-    [Header("Paramètres du Combo")]
-    [SerializeField] private float comboTimeWindow = 1f;
-    [SerializeField] private float attackDuration = 0.5f;
+    [Header("Réglages")]
+    [SerializeField] private float comboWindow = 0.8f; // Temps pour enchaîner
+    [SerializeField] private float portee = 1.5f;
 
-    private const string ATTACK_ACTION = "Attack";
-
-    private Animator animator;
-    private int comboStep = 0;
-    private float lastAttackTime = -999f;
-    private bool isAttacking = false;
-    private bool canCombo = false;
-
-    private PlayerInput playerInput;
+    private Animator anim;
+    private PlayerInput input;
     private InputAction attackAction;
+
+    private int comboStep = 0;
+    private float lastClickTime;
+    private bool isAttacking = false;
 
     void Start()
     {
-        animator = GetComponent<Animator>();
-        if (animator == null)
-            animator = GetComponentInChildren<Animator>();
-
-        playerInput = GetComponent<PlayerInput>();
-        attackAction = playerInput.actions.FindAction(ATTACK_ACTION);
+        anim = GetComponentInChildren<Animator>();
+        input = GetComponent<PlayerInput>();
+        attackAction = input.actions.FindAction("Attack");
     }
 
     void Update()
     {
-        if (attackAction != null && attackAction.WasPressedThisFrame())
+        // 1. Détection du clic
+        if (attackAction.WasPressedThisFrame())
         {
-            if (canCombo)
-            {
-                comboStep++;
-                canCombo = false;
-                PerformAttack();
-            }
-            else if (!isAttacking)
-            {
-                comboStep = 0;
-                PerformAttack();
-            }
+            OnAttackClicked();
         }
 
-        if (Time.time - lastAttackTime > comboTimeWindow && isAttacking)
+        // 2. Reset automatique si on attend trop longtemps
+        if (isAttacking && Time.time - lastClickTime > comboWindow)
         {
-            EndCombo();
+            ResetCombo();
         }
     }
 
-    void PerformAttack()
+    void OnAttackClicked()
     {
-        if (comboStep > 2)
+        lastClickTime = Time.time;
+
+        if (!isAttacking)
         {
-            EndCombo();
-            return;
+            // Premier coup
+            isAttacking = true;
+            comboStep = 0;
+            PlayAttack();
         }
-
-        animator.SetInteger("ComboAttack", comboStep);
-        animator.SetBool("isAttacking", true);
-
-        switch (comboStep)
+        else if (Time.time - lastClickTime < comboWindow)
         {
-            case 0:
-                animator.Play("katana1", 0, 0f);
-                break;
-            case 1:
-                animator.Play("katana2", 0, 0f);
-                break;
-            case 2:
-                animator.Play("katana3", 0, 0f);
-                break;
+            // Enchaînement (Combo)
+            comboStep++;
+            if (comboStep > 2) comboStep = 0; // On boucle le combo 1-2-3
+            PlayAttack();
         }
-
-        lastAttackTime = Time.time;
-        isAttacking = true;
-
-        StopAllCoroutines();
-        StartCoroutine(AttackRoutine());
     }
 
-    IEnumerator AttackRoutine()
+    void PlayAttack()
     {
-        yield return new WaitForSeconds(attackDuration * 0.6f);
-        canCombo = true;
+        // On force les paramètres de TON animator
+        anim.SetBool("isAttacking", true);
+        anim.SetInteger("ComboAttack", comboStep);
 
-        yield return new WaitForSeconds(attackDuration * 0.4f);
-        canCombo = false;
+        // On force le lancement de l'anim pour éviter les transitions bloquées
+        anim.Play("katana" + (comboStep + 1), 0, 0f);
 
-        if (Time.time - lastAttackTime >= comboTimeWindow)
+        // On lance la détection de dégâts direct
+        DetecterEnnemis();
+    }
+
+    void DetecterEnnemis()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, portee);
+        foreach (var hit in hits)
         {
-            EndCombo();
+            if (hit.CompareTag("Enemy"))
+            {
+                // On essaie de trouver le script peu importe l'orthographe
+                var target = hit.GetComponent<MonoBehaviour>();
+                target.Invoke("Mourir", 0);
+            }
         }
     }
 
-    void EndCombo()
+    void ResetCombo()
     {
         isAttacking = false;
-        canCombo = false;
         comboStep = 0;
-        animator.SetBool("isAttacking", false);
-        animator.SetInteger("ComboAttack", 0);
+        anim.SetBool("isAttacking", false);
+        anim.SetInteger("ComboAttack", 0);
     }
 
-    public void ForceResetCombo()
+    void OnDrawGizmosSelected()
     {
-        StopAllCoroutines();
-        EndCombo();
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, portee);
     }
 }

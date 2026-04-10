@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -50,7 +51,7 @@ public class PlayerHealth : MonoBehaviour
     
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.K))
+        if (Keyboard.current.kKey.wasPressedThisFrame)
         {
             Mourir();
         }

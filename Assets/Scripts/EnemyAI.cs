@@ -4,45 +4,43 @@ public class EnemyAI : MonoBehaviour
 {
     [Header("Poursuite")]
     [SerializeField] private float vitesse = 3f;
-    [SerializeField] private float distanceDetection = 5f;
-    [SerializeField] private float distanceAttaque = 1f;
-    
-    [Header("Combat")]
-    [SerializeField] private bool peutAttaquer = true;
-    [SerializeField] private float cooldownAttaque = 1f;
+    [SerializeField] private float distanceDetection = 999f;
     
     private Transform player;
-    private Animator animator;
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-    
-    private bool isDead = false;
-    private float derniereAttaque = 0f;
-    private bool estProche = false;
+    private bool aToucheJoueur = false;
     
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        animator = GetComponentInChildren<Animator>();
+        
         rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0f;
+            rb.freezeRotation = true;
+        }
+        
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         
         if (player == null)
         {
-            Debug.LogError("bug player pas trouve");
+            Debug.LogError("pas de player");
         }
+        
     }
     
     void Update()
     {
-        if (isDead || player == null) return;
+        if (player == null || aToucheJoueur) return;
         
         float distance = Vector2.Distance(transform.position, player.position);
-        estProche = distance <= distanceDetection;
         
-        if (estProche)
+        if (distance <= distanceDetection)
         {
-            PoursuivreJoueur(distance);
+            PoursuivreJoueur();
         }
         else
         {
@@ -50,108 +48,47 @@ public class EnemyAI : MonoBehaviour
         }
     }
     
-    void PoursuivreJoueur(float distance)
+    void PoursuivreJoueur()
     {
         Vector2 direction = (player.position - transform.position).normalized;
+        rb.linearVelocity = direction * vitesse;
         
-        if (distance > distanceAttaque)
+        if (spriteRenderer != null)
         {
-            rb.linearVelocity = direction * vitesse;
-            
-            if (animator != null)
-            {
-                animator.SetBool("isMoving", true);
-                animator.SetBool("isAttacking", false);
-            }
-            
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.flipX = direction.x < 0;
-            }
-        }
-        else
-        {
-            ArretMouvement();
-            
-            if (peutAttaquer && Time.time > derniereAttaque + cooldownAttaque)
-            {
-                Attaquer();
-            }
+            spriteRenderer.flipX = direction.x < 0;
         }
     }
     
     void ArretMouvement()
     {
         rb.linearVelocity = Vector2.zero;
-        
-        if (animator != null && !isDead)
-        {
-            animator.SetBool("isMoving", false);
-        }
     }
     
-    void Attaquer()
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        derniereAttaque = Time.time;
         
-        if (animator != null)
+        if (collision.gameObject.CompareTag("Player"))
         {
-            animator.SetBool("isAttacking", true);
+            aToucheJoueur = true;
+            ArretMouvement();
             
-            int attackType = Random.Range(1, 4);
-            animator.SetInteger("ComboAttack", attackType);
-            animator.Play("katana" + attackType, 0, 0f);
-            
-            Invoke("DetecterJoueur", 0.3f);
-            
-            Invoke("ResetAttaque", 0.8f);
-        }
-    }
-    
-    void DetecterJoueur()
-    {
-        if (isDead) return;
-        
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, distanceAttaque);
-        foreach (var hit in hits)
-        {
-            if (hit.CompareTag("Player"))
+            var playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
             {
-                var playerHealth = hit.GetComponent<PlayerHealth>();
-                if (playerHealth != null)
-                {
-                    playerHealth.Mourir();
-                }
-                else
-                {
-                    hit.SendMessage("Mourir", SendMessageOptions.DontRequireReceiver);
-                }
-                break;
+                playerHealth.Mourir();
             }
         }
     }
     
-    void ResetAttaque()
-    {
-        if (animator != null)
-        {
-            animator.SetBool("isAttacking", false);
-            animator.SetInteger("ComboAttack", 0);
-        }
-    }
     
     public void Mourir()
     {
-        if (isDead) return;
+        if (aToucheJoueur) return;
         
-        isDead = true;
+        aToucheJoueur = true;
         ArretMouvement();
         
-        if (animator != null)
-        {
-            animator.SetBool("isDead", true);
-            animator.Play("Death", 0, 0f);
-        }
+        Debug.Log("mort");
         
         var colliders = GetComponents<Collider2D>();
         foreach (var col in colliders)
@@ -159,15 +96,12 @@ public class EnemyAI : MonoBehaviour
             col.enabled = false;
         }
         
-        Destroy(gameObject, 2f);
+        Destroy(gameObject, 1f);
     }
     
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, distanceDetection);
-        
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, distanceAttaque);
     }
 }

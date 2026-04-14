@@ -79,7 +79,7 @@ public class EnemySpawner : MonoBehaviour
             
             if (tentatives >= maxTentatives)
             {
-               return;
+               return transform.position;
             }
             
         } while (Vector3.Distance(position, player.position) < distanceMinJoueur);

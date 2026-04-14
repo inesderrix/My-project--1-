@@ -80,6 +80,21 @@ public class EnemyAI : MonoBehaviour
         }
     }
     
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        
+        if (other.CompareTag("Player"))
+        {
+            aToucheJoueur = true;
+            ArretMouvement();
+            
+            var playerHealth = other.gameObject.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.Mourir();
+            }
+        }
+    }
     
     public void Mourir()
     {
@@ -87,8 +102,6 @@ public class EnemyAI : MonoBehaviour
         
         aToucheJoueur = true;
         ArretMouvement();
-        
-        Debug.Log("mort");
         
         var colliders = GetComponents<Collider2D>();
         foreach (var col in colliders)

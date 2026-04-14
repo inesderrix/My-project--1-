@@ -24,7 +24,8 @@ public class CameraRepairSystem : MonoBehaviour
     private AudioSource audioSource;
     private PlayerInput playerInput;
 
-    private List<string> repairSequence = new List<string> { "I", "K", "O", "L" };
+    private List<string> allKeys = new List<string> { "I", "K", "O", "L" };
+    private List<string> repairSequence = new List<string>();
     private int currentIndex = 0;
     private bool repairInProgress = false;
     private Camera brokenCamera = null;
@@ -84,6 +85,7 @@ public class CameraRepairSystem : MonoBehaviour
         brokenCamera = activeCameras[randomIndex];
         brokenCamera.enabled = false;
 
+        GenererSequenceAleatoire();
         repairInProgress = true;
         currentIndex = 0;
 
@@ -138,6 +140,18 @@ public class CameraRepairSystem : MonoBehaviour
 
         nextFailureTime = Time.time + intervalBetweenFailures;
         audioSource.Stop();
+    }
+
+    void GenererSequenceAleatoire()
+    {
+        repairSequence.Clear();
+        int sequenceLength = Random.Range(3, 6);
+        
+        for (int i = 0; i < sequenceLength; i++)
+        {
+            int randomIndex = Random.Range(0, allKeys.Count);
+            repairSequence.Add(allKeys[randomIndex]);
+        }
     }
 
     void UpdateQTEDisplay()

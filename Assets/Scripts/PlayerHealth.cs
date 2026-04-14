@@ -19,6 +19,7 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isDead) return;
         
+        Debug.Log("PlayerHealth.Mourir() appelé!");
         isDead = true;
         
         if (rb != null)

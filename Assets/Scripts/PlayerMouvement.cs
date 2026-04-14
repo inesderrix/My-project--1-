@@ -15,6 +15,7 @@ public class PlayerMouvement : MonoBehaviour
 
     private PlayerInput playerInput;
     private InputAction moveAction;
+    private PlayerDash playerDash;
 
     void Start()
     {
@@ -30,11 +31,9 @@ public class PlayerMouvement : MonoBehaviour
             animator = GetComponentInChildren<Animator>();
         }
 
-
         playerInput = GetComponent<PlayerInput>();
-
         moveAction = playerInput.actions.FindAction(MOVE_ACTION);
-
+        playerDash = GetComponent<PlayerDash>();
     }
 
     void Update()
@@ -50,6 +49,11 @@ public class PlayerMouvement : MonoBehaviour
 
     void DeplacerPersonnage()
     {
+        if (playerDash != null && playerDash.IsDashing())
+        {
+            return;
+        }
+        
         Vector3 direction = new Vector3(moveInput.x, moveInput.y, 0);
 
         if (moveInput.x != 0)

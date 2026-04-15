@@ -171,7 +171,7 @@ public class SimpleEquipmentManager : MonoBehaviour
         UpdateWeaponDisplay();
     }
     
-    //ne marche pas probleme rendu 
+    //ne marche pas probleme rendu a revoir
     void Handle3DViewer()
     {
         if (isWeaponSelected && previewPanel != null && previewPanel.activeSelf)

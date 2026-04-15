@@ -15,8 +15,14 @@ public class CameraRepairSystem : MonoBehaviour
 
     [Header("UI QTE")]
     [SerializeField] private Canvas qteCanvas;
-    [SerializeField] private UnityEngine.UI.Text codeText;
+    [SerializeField] private UnityEngine.UI.Image[] keyImages; 
     [SerializeField] private UnityEngine.UI.Text infoText;
+    
+    [Header("Key Images")]
+    [SerializeField] private Sprite iKeySprite;  
+    [SerializeField] private Sprite kKeySprite;  
+    [SerializeField] private Sprite oKeySprite;  
+    [SerializeField] private Sprite lKeySprite;  
 
     [Header("Audio")]
     [SerializeField] private AudioClip cameraFailSound;
@@ -73,13 +79,20 @@ public class CameraRepairSystem : MonoBehaviour
         if (plateauCameras.Length == 0) return;
 
         List<Camera> activeCameras = new List<Camera>();
+        
         foreach (Camera cam in plateauCameras)
         {
-            if (cam != null && cam.enabled)
-                activeCameras.Add(cam);
+            if (cam != null)
+            {
+                if (cam.enabled)
+                    activeCameras.Add(cam);
+            }
         }
-
-        if (activeCameras.Count == 0) return;
+        
+        if (activeCameras.Count == 0) 
+        {
+            return;
+        }
 
         int randomIndex = Random.Range(0, activeCameras.Count);
         brokenCamera = activeCameras[randomIndex];
@@ -139,48 +152,90 @@ public class CameraRepairSystem : MonoBehaviour
         }
 
         nextFailureTime = Time.time + intervalBetweenFailures;
+        
+        InitializeInfoText();
         audioSource.Stop();
     }
 
     void GenererSequenceAleatoire()
     {
         repairSequence.Clear();
-        int sequenceLength = Random.Range(3, 6);
+        int sequenceLength = 4;
         
         for (int i = 0; i < sequenceLength; i++)
         {
             int randomIndex = Random.Range(0, allKeys.Count);
             repairSequence.Add(allKeys[randomIndex]);
         }
+        
+        Debug.Log($"Séquence QTE: {string.Join("-", repairSequence.ToArray())}");
     }
 
     void UpdateQTEDisplay()
     {
-
-        if (codeText == null)
+        if (keyImages == null || keyImages.Length < 4)
         {
             return;
         }
 
-        string displayText = "";
-        for (int i = 0; i < repairSequence.Count; i++)
+        for (int i = 0; i < 4; i++)
         {
-            if (i < currentIndex)
+            if (i < repairSequence.Count)
             {
-                displayText += $"<color=green>{repairSequence[i]}</color> ";
-            }
-            else if (i == currentIndex)
-            {
-                displayText += $"<color=yellow>{repairSequence[i]}</color> ";
+                string key = repairSequence[i];
+                Sprite keySprite = GetKeySprite(key);
+                
+                if (keySprite != null && keyImages[i] != null)
+                {
+                    keyImages[i].sprite = keySprite;
+                    keyImages[i].enabled = true;
+                    
+                
+                    if (i < currentIndex)
+                    {
+                        keyImages[i].color = Color.green;   
+                    }
+                    else if (i == currentIndex)
+                    {
+                        keyImages[i].color = Color.yellow; 
+                    }
+                    else
+                    {
+                        keyImages[i].color = Color.white; 
+                    }
+                    
+                }
             }
             else
             {
-                displayText += $"<color=white>{repairSequence[i]}</color> ";
+                if (keyImages[i] != null)
+                {
+                    keyImages[i].enabled = false;
+                }
             }
         }
-
-        codeText.text = displayText;
-
+        
+    }
+    
+    Sprite GetKeySprite(string key)
+    {
+        switch (key)
+        {
+            case "I":
+                return iKeySprite;  
+            case "K":   
+                return kKeySprite;  
+            case "O":
+                return oKeySprite;  
+            case "L":
+                return lKeySprite;  
+            default:
+                return null;
+        }
+    }
+    
+    void InitializeInfoText()
+    {
         if (infoText != null)
         {
             infoText.text = "CAMÉRA EN PANNE - ENTREZ LE CODE";

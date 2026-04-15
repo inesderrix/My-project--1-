@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -19,7 +20,6 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isDead) return;
         
-        Debug.Log("PlayerHealth.Mourir() appelé!");
         isDead = true;
         
         if (rb != null)
@@ -45,16 +45,22 @@ public class PlayerHealth : MonoBehaviour
             col.enabled = false;
         }
         
-        Debug.Log("Le joueur est mort!");
+        if (GameManager.Instance != null)
+        {
+            StartCoroutine(DelayedDefeat());
+        }
         
         Destroy(gameObject, 2f);
     }
     
+    IEnumerator DelayedDefeat()
+    {
+        yield return new WaitForSeconds(1.5f); // Délai de 1.5 secondes
+        GameManager.Instance.OnPlayerDeath();
+    }
+    
     void Update()
     {
-        if (Keyboard.current.kKey.wasPressedThisFrame)
-        {
-            Mourir();
-        }
+       
     }
 }

@@ -103,13 +103,21 @@ public class EnemyAI : MonoBehaviour
         aToucheJoueur = true;
         ArretMouvement();
         
+        Debug.Log("mort");
+        
+        // Appeler le GameManager pour compter l'ennemi tué
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnEnemyKilled();
+        }
+        
         var colliders = GetComponents<Collider2D>();
         foreach (var col in colliders)
         {
             col.enabled = false;
         }
         
-        Destroy(gameObject, 1f);
+        Destroy(gameObject, 2f);
     }
     
     void OnDrawGizmosSelected()

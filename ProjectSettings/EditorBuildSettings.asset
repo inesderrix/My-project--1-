@@ -12,8 +12,11 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/EquipementMenu.unity
-    guid: cf617f0805d998f43994b4ff1daa06ae
+    path: Assets/Scenes/Defaite.unity
+    guid: 3403b06e56836764492a2c1f800c443a
+  - enabled: 1
+    path: Assets/Scenes/Victoire.unity
+    guid: 3656e63f3eae5cc448cbc3dea444e5d0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

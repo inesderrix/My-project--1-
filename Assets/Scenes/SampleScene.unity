@@ -3406,10 +3406,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 2192980994578207249, guid: d20cb0033331293489c74b27877aa4f1, type: 3}
-  ennemisParVague: 0
+  ennemisParVague: 3
   tempsEntreVagues: 5
   delaiEntreEnnemis: 0.5
-  maxEnnemis: 1
+  maxEnnemis: 15
   rayonSpawn: 10
   distanceMinJoueur: 8
 --- !u!4 &1903576735

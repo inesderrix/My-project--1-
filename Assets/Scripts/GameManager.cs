@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     [Header("Game Stats")]
     [SerializeField] private int enemiesKilled = 0;
-    [SerializeField] private int enemiesToWin = 20;
+    [SerializeField] private int enemiesToWin = 30;
     
     [Header("Scene Management")]
     [SerializeField] private int defeatSceneIndex = 2;

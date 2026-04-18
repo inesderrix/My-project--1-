@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class CameraRepairSystem : MonoBehaviour
 {
     [Header("Timing")]
-    [SerializeField] private float intervalBetweenFailures = 120f;
+    [SerializeField] private float intervalBetweenFailures = 30f;
 
     [Header("Caméras Plateau")]
     [SerializeField] private Camera[] plateauCameras;

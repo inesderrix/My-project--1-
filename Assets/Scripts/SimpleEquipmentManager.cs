@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
 public class SimpleEquipmentManager : MonoBehaviour
@@ -118,11 +120,12 @@ public class SimpleEquipmentManager : MonoBehaviour
     
     void Update()
     {
-        HandleWeaponSelection();
+        HandleInput();
         Handle3DViewer();
+        HandleClickOutside();
     }
     
-    void HandleWeaponSelection()
+    void HandleInput()
     {
         if (Keyboard.current != null && Keyboard.current.leftArrowKey.wasPressedThisFrame)
         {
@@ -165,13 +168,12 @@ public class SimpleEquipmentManager : MonoBehaviour
             weapon3D.name = $"Weapon_3D_{index}";
             weapon3D.transform.localPosition = Vector3.zero;
             weapon3D.transform.localRotation = Quaternion.identity;
-            weapon3D.transform.localScale = Vector3.one * 2f;        
+            weapon3D.transform.localScale = Vector3.one*50f;        
         }
         
         UpdateWeaponDisplay();
     }
     
-    //ne marche pas probleme rendu a revoir
     void Handle3DViewer()
     {
         if (isWeaponSelected && previewPanel != null && previewPanel.activeSelf)
@@ -180,6 +182,40 @@ public class SimpleEquipmentManager : MonoBehaviour
         }
     }
     
+    void HandleClickOutside()
+    {
+        if (isWeaponSelected && previewPanel != null && previewPanel.activeSelf)
+        {
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                CloseWeaponPreview();
+            }
+        }
+    }
+    
+        
+    void CloseWeaponPreview()
+    {
+        isWeaponSelected = false;
+        selectedWeaponIndex = -1;
+        
+        UpdateWeaponDisplay();
+        
+        if (previewPanel != null)
+        {
+            previewPanel.SetActive(false);
+            
+            foreach (Transform child in previewPanel.transform)
+            {
+                if (child.name.StartsWith("Weapon_3D_"))
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+        }
+    }
+    
+        
     void UpdateWeaponDisplay()
     {
         for (int i = 1; i <= 6; i++)

@@ -145,8 +145,8 @@ Transform:
   m_GameObject: {fileID: 9095058}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.23, y: -1.53, z: 0}
-  m_LocalScale: {x: 0.57062066, y: 0.67477083, z: 0.5419}
+  m_LocalPosition: {x: -2.9645, y: -1.4857, z: 0}
+  m_LocalScale: {x: 0.59829575, y: 0.68293554, z: 0.5419}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 152318081}
@@ -4760,7 +4760,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7e4129b2d135e54bbdbf9d2b37ad0ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  intervalBetweenFailures: 120
+  intervalBetweenFailures: 30
   plateauCameras:
   - {fileID: 330585545}
   - {fileID: 216694167}
@@ -6926,7 +6926,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   enemiesKilled: 0
-  enemiesToWin: 50
+  enemiesToWin: 30
   defeatSceneIndex: 2
   victorySceneIndex: 3
 --- !u!4 &1646796445

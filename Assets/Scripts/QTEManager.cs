@@ -18,6 +18,10 @@ public class CameraRepairSystem : MonoBehaviour
     [SerializeField] private UnityEngine.UI.Image[] keyImages; 
     [SerializeField] private UnityEngine.UI.Text infoText;
     
+    [Header("Caméra Désactivée UI")]
+    [SerializeField] private Canvas cameraDisabledCanvas;
+    [SerializeField] private UnityEngine.UI.Text cameraDisabledText;
+    
     [Header("Key Images")]
     [SerializeField] private Sprite iKeySprite;  
     [SerializeField] private Sprite kKeySprite;  
@@ -96,7 +100,8 @@ public class CameraRepairSystem : MonoBehaviour
 
         int randomIndex = Random.Range(0, activeCameras.Count);
         brokenCamera = activeCameras[randomIndex];
-        brokenCamera.enabled = false;
+    
+        ShowCameraDisabledUI();
 
         GenererSequenceAleatoire();
         repairInProgress = true;
@@ -139,13 +144,14 @@ public class CameraRepairSystem : MonoBehaviour
     {
         if (brokenCamera != null)
         {
-            brokenCamera.enabled = true;
             brokenCamera = null;
         }
 
         repairInProgress = false;
         currentIndex = 0;
 
+        HideCameraDisabledUI();
+        
         if (qteCanvas != null)
         {
             qteCanvas.gameObject.SetActive(false);
@@ -245,5 +251,29 @@ public class CameraRepairSystem : MonoBehaviour
     public bool IsRepairInProgress()
     {
         return repairInProgress;
+    }
+    
+    void ShowCameraDisabledUI()
+    {
+        if (cameraDisabledCanvas != null && brokenCamera != null)
+        {
+            cameraDisabledCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+            cameraDisabledCanvas.worldCamera = brokenCamera;
+            
+            cameraDisabledCanvas.gameObject.SetActive(true);
+            
+            if (cameraDisabledText != null)
+            {
+                cameraDisabledText.text = $"CAMÉRA DÉSACTIVÉE: {brokenCamera.name}";
+            }
+        }
+    }
+    
+    void HideCameraDisabledUI()
+    {
+        if (cameraDisabledCanvas != null)
+        {
+            cameraDisabledCanvas.gameObject.SetActive(false);
+        }
     }
 }

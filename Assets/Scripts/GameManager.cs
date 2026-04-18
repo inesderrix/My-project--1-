@@ -11,11 +11,12 @@ public class GameManager : MonoBehaviour
     [Header("Scene Management")]
     [SerializeField] private int defeatSceneIndex = 2;
     [SerializeField] private int victorySceneIndex = 3;
-    
+
     public static GameManager Instance { get; private set; }
     
     void Awake()
     {
+        // Create singleton instance
         if (Instance == null)
         {
             Instance = this;
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviour
     {
         enemiesKilled++;
         
+        // Check victory condition
         if (enemiesKilled >= enemiesToWin)
         {
             OnVictory();

@@ -43,17 +43,21 @@ public class PlayerMouvement : MonoBehaviour
             moveInput = moveAction.ReadValue<Vector2>();
         }
 
+        // Move character
         DeplacerPersonnage();
+        // Flip sprite direction
         FlipSprite();
     }
 
     void DeplacerPersonnage()
     {
+        // Skip if dashing
         if (playerDash != null && playerDash.IsDashing())
         {
             return;
         }
         
+        // Calculate move direction
         Vector3 direction = new Vector3(moveInput.x, moveInput.y, 0);
 
         if (moveInput.x != 0)
@@ -61,6 +65,7 @@ public class PlayerMouvement : MonoBehaviour
             dernierHorizontal = moveInput.x;
         }
 
+        // Apply movement
         transform.position += direction * vitesse * Time.deltaTime;
 
         if (animator != null)
@@ -72,6 +77,7 @@ public class PlayerMouvement : MonoBehaviour
 
     void FlipSprite()
     {
+        // Flip based on direction
         if (spriteRenderer != null && dernierHorizontal != 0)
         {
             spriteRenderer.flipX = dernierHorizontal < 0;

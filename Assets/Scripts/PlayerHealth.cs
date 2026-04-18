@@ -22,6 +22,7 @@ public class PlayerHealth : MonoBehaviour
         
         isDead = true;
         
+        // Stop physics movement
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
@@ -33,10 +34,11 @@ public class PlayerHealth : MonoBehaviour
             playerMouvement.enabled = false;
         }
         
+        // Play death animation
         if (animator != null)
         {
             animator.SetBool("isDead", true);
-            animator.Play("Death", 0, 0f);
+            //create animation death
         }
         
         var colliders = GetComponents<Collider2D>();
@@ -55,7 +57,9 @@ public class PlayerHealth : MonoBehaviour
     
     IEnumerator DelayedDefeat()
     {
-        yield return new WaitForSeconds(1.5f); // Délai de 1.5 secondes
+        // Wait for animation if we had one (I leave if ever)
+        yield return new WaitForSeconds(1.5f);
+        // Call game over
         GameManager.Instance.OnPlayerDeath();
     }
     

@@ -27,6 +27,7 @@ public class PlayerDash : MonoBehaviour
     
     void Update()
     {
+        // Check dash input
         if (playerInput != null && !isDashing && Time.time >= lastDashTime + dashCooldown)
         {
             if (playerInput.actions["ButtonU"].WasPressedThisFrame())
@@ -47,6 +48,7 @@ public class PlayerDash : MonoBehaviour
             moveInput = playerInput.actions["Move"].ReadValue<Vector2>();
         }
         
+        // Cancel if not moving
         if (moveInput.magnitude < 0.1f)
         {
             isDashing = false;
@@ -57,6 +59,7 @@ public class PlayerDash : MonoBehaviour
         
         rb.linearVelocity = dashDirection * dashSpeed;
         
+        // Schedule dash end
         Invoke("StopDash", dashDuration);
     }
     

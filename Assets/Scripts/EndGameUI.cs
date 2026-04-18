@@ -18,6 +18,7 @@ public class EndGameUI : MonoBehaviour
     
     void Start()
     {
+        // Check game result
         if (GameManager.Instance != null)
         {
             isVictory = GameManager.Instance.GetEnemiesKilled() >= GameManager.Instance.GetEnemiesToWin();
@@ -28,6 +29,7 @@ public class EndGameUI : MonoBehaviour
     
     void SetupUI()
     {
+        // Determine game outcome
         if (isVictory)
         {
             SetupVictoryUI();
@@ -37,6 +39,7 @@ public class EndGameUI : MonoBehaviour
             SetupDefeatUI();
         }
         
+        // Add button listeners
         if (mainMenuButton != null)
         {
             mainMenuButton.onClick.AddListener(OnMainMenuClicked);
@@ -89,7 +92,7 @@ public class EndGameUI : MonoBehaviour
             statsText.color = Color.gray;
         }
         
-            if (retryButton != null)
+        if (retryButton != null)
         {
             retryButton.gameObject.SetActive(false);
         }

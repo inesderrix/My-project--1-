@@ -10,12 +10,14 @@ public class MenuMusicManager : MonoBehaviour
     
     void Start()
     {
+        // Get or create audio source
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         
+        // Start menu music
         if (menuMusic != null)
         {
             audioSource.clip = menuMusic;

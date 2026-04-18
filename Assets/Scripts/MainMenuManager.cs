@@ -17,16 +17,19 @@ public class MainMenuManager : MonoBehaviour
     
     void Start()
     {
+        // Setup play button
         if (jouerButton != null)
         {
             jouerButton.onClick.AddListener(OnJouerClicked);
         }
         
+        // Setup equipment button
         if (equipementButton != null)
         {
             equipementButton.onClick.AddListener(OnEquipementClicked);
         }
         
+        // Setup quit button
         if (quitterButton != null)
         {
             quitterButton.onClick.AddListener(OnQuitterClicked);
@@ -40,13 +43,13 @@ public class MainMenuManager : MonoBehaviour
     
     void OnJouerClicked()
     {
-        
+        // Load game scene
         SceneManager.LoadScene(gameSceneName);
     }
     
     void OnEquipementClicked()
     {
-        
+        // Show equipment panel
         if (equipmentPanel != null)
         {
             equipmentPanel.SetActive(true);
@@ -64,7 +67,7 @@ public class MainMenuManager : MonoBehaviour
     
     void OnQuitterClicked()
     {
-        
+        // Exit application
         #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
         #else

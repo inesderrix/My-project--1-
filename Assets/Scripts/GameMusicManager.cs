@@ -10,12 +10,14 @@ public class GameMusicManager : MonoBehaviour
     
     void Start()
     {
+        // Get or create audio source
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         
+        // Start background music
         if (gameMusic != null)
         {
             audioSource.clip = gameMusic;

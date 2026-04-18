@@ -20,6 +20,7 @@ public class SimpleEquipmentManager : MonoBehaviour
     
     void Start()
     {
+        // Setup back button listener
         if (backButton != null)
         {
             backButton.onClick.AddListener(OnBackClicked);
@@ -27,6 +28,7 @@ public class SimpleEquipmentManager : MonoBehaviour
         
         InitializeWeaponSlots();
         
+        // Hide preview panel initially
         if (previewPanel != null)
         {
             previewPanel.SetActive(false);
@@ -40,6 +42,7 @@ public class SimpleEquipmentManager : MonoBehaviour
             return;
         }
         
+        // Create default weapon if empty
         if (availableWeapons == null || availableWeapons.Length == 0)
         {
             availableWeapons = new GameObject[1];
@@ -120,27 +123,13 @@ public class SimpleEquipmentManager : MonoBehaviour
     
     void Update()
     {
-        HandleInput();
         Handle3DViewer();
         HandleClickOutside();
     }
     
-    void HandleInput()
-    {
-        if (Keyboard.current != null && Keyboard.current.leftArrowKey.wasPressedThisFrame)
-        {
-            selectedWeaponIndex = (selectedWeaponIndex - 1 + 6) % 6;
-            UpdateWeaponDisplay();
-        }
-        else if (Keyboard.current != null && Keyboard.current.rightArrowKey.wasPressedThisFrame)
-        {
-            selectedWeaponIndex = (selectedWeaponIndex + 1) % 6;
-            UpdateWeaponDisplay();
-        }
-    }
-    
     void SelectWeapon(int index)
     {
+        // Validate weapon index
         if (index >= availableWeapons.Length || availableWeapons[index] == null)
         {
             return;
@@ -156,6 +145,7 @@ public class SimpleEquipmentManager : MonoBehaviour
             
             UpdateWeaponDisplay();
             
+            // Clean old 3D weapons
             foreach (Transform child in previewPanel.transform)
             {
                 if (child.name.StartsWith("Weapon_3D_"))
@@ -164,6 +154,7 @@ public class SimpleEquipmentManager : MonoBehaviour
                 }
             }
             
+            // Spawn new 3D weapon
             GameObject weapon3D = Instantiate(availableWeapons[index], previewPanel.transform);
             weapon3D.name = $"Weapon_3D_{index}";
             weapon3D.transform.localPosition = Vector3.zero;
@@ -176,6 +167,7 @@ public class SimpleEquipmentManager : MonoBehaviour
     
     void Handle3DViewer()
     {
+        // Rotate weapon when selected
         if (isWeaponSelected && previewPanel != null && previewPanel.activeSelf)
         {
             previewPanel.transform.Rotate(0, 30 * Time.deltaTime, 0);
@@ -186,6 +178,7 @@ public class SimpleEquipmentManager : MonoBehaviour
     {
         if (isWeaponSelected && previewPanel != null && previewPanel.activeSelf)
         {
+            // Close on any click
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
                 CloseWeaponPreview();
@@ -196,6 +189,7 @@ public class SimpleEquipmentManager : MonoBehaviour
         
     void CloseWeaponPreview()
     {
+        // Reset selection state
         isWeaponSelected = false;
         selectedWeaponIndex = -1;
         

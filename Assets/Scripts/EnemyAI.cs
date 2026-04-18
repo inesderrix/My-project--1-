@@ -13,6 +13,7 @@ public class EnemyAI : MonoBehaviour
     
     void Start()
     {
+        // Find player reference
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         
         rb = GetComponent<Rigidbody2D>();
@@ -36,8 +37,10 @@ public class EnemyAI : MonoBehaviour
     {
         if (player == null || aToucheJoueur) return;
         
+        // Calculate distance to player
         float distance = Vector2.Distance(transform.position, player.position);
         
+        // Chase or stop
         if (distance <= distanceDetection)
         {
             PoursuivreJoueur();
@@ -53,6 +56,7 @@ public class EnemyAI : MonoBehaviour
         Vector2 direction = (player.position - transform.position).normalized;
         rb.linearVelocity = direction * vitesse;
         
+        // Flip sprite direction
         if (spriteRenderer != null)
         {
             spriteRenderer.flipX = direction.x < 0;
@@ -64,14 +68,17 @@ public class EnemyAI : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
     }
     
+
+    // Called when enemy collides with player
     void OnCollisionEnter2D(Collision2D collision)
     {
-        
+        // Check if hit player
         if (collision.gameObject.CompareTag("Player"))
         {
             aToucheJoueur = true;
             ArretMouvement();
             
+            // Kill the player
             var playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
@@ -80,14 +87,17 @@ public class EnemyAI : MonoBehaviour
         }
     }
     
+
+    // Called when enemy hits player with trigger
     void OnTriggerEnter2D(Collider2D other)
     {
-        
+        // Check if hit player
         if (other.CompareTag("Player"))
         {
             aToucheJoueur = true;
             ArretMouvement();
             
+            // Kill the player
             var playerHealth = other.gameObject.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
@@ -103,9 +113,6 @@ public class EnemyAI : MonoBehaviour
         aToucheJoueur = true;
         ArretMouvement();
         
-        Debug.Log("mort");
-        
-        // Appeler le GameManager pour compter l'ennemi tué
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnEnemyKilled();

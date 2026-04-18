@@ -50,8 +50,7 @@ public class CameraRepairSystem : MonoBehaviour
         }
         playerInput = FindObjectOfType<PlayerInput>();
 
-
-
+        // Schedule first QTE event
         nextFailureTime = Time.time + intervalBetweenFailures;
 
         if (qteCamera != null)
@@ -67,6 +66,7 @@ public class CameraRepairSystem : MonoBehaviour
 
     void Update()
     {
+        // Check for QTE trigger
         if (!repairInProgress && Time.time >= nextFailureTime)
         {
             BreakRandomCamera();
@@ -84,6 +84,7 @@ public class CameraRepairSystem : MonoBehaviour
 
         List<Camera> activeCameras = new List<Camera>();
         
+        // Find active cameras
         foreach (Camera cam in plateauCameras)
         {
             if (cam != null)
@@ -98,6 +99,7 @@ public class CameraRepairSystem : MonoBehaviour
             return;
         }
 
+        // Select random camera to break
         int randomIndex = Random.Range(0, activeCameras.Count);
         brokenCamera = activeCameras[randomIndex];
     
@@ -107,6 +109,7 @@ public class CameraRepairSystem : MonoBehaviour
         repairInProgress = true;
         currentIndex = 0;
 
+        // Activate QTE interface
         if (qteCanvas != null)
         {
             qteCanvas.gameObject.SetActive(true);
@@ -125,6 +128,7 @@ public class CameraRepairSystem : MonoBehaviour
     {
         if (playerInput == null) return;
 
+        // Get current expected key
         string expectedKey = repairSequence[currentIndex];
 
         if (playerInput.actions[$"Button{expectedKey}"].WasPressedThisFrame())
@@ -142,11 +146,13 @@ public class CameraRepairSystem : MonoBehaviour
 
     void RepairCamera()
     {
+        // Clear broken camera ref
         if (brokenCamera != null)
         {
             brokenCamera = null;
         }
 
+        // Reset QTE state
         repairInProgress = false;
         currentIndex = 0;
 
@@ -168,6 +174,7 @@ public class CameraRepairSystem : MonoBehaviour
         repairSequence.Clear();
         int sequenceLength = 4;
         
+        // Generate QTE sequence
         for (int i = 0; i < sequenceLength; i++)
         {
             int randomIndex = Random.Range(0, allKeys.Count);
@@ -184,6 +191,7 @@ public class CameraRepairSystem : MonoBehaviour
             return;
         }
 
+        // Update key display
         for (int i = 0; i < 4; i++)
         {
             if (i < repairSequence.Count)
@@ -255,6 +263,7 @@ public class CameraRepairSystem : MonoBehaviour
     
     void ShowCameraDisabledUI()
     {
+        // Setup canvas for display
         if (cameraDisabledCanvas != null && brokenCamera != null)
         {
             cameraDisabledCanvas.renderMode = RenderMode.ScreenSpaceCamera;

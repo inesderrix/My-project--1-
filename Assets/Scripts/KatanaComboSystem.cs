@@ -10,7 +10,6 @@ public class KatanaComboSystem : MonoBehaviour
     private Animator anim;
     private PlayerInput input;
     private InputAction attackAction;
-
     private int comboStep = 0;
     private float lastClickTime;
     private bool isAttacking = false;
@@ -24,11 +23,13 @@ public class KatanaComboSystem : MonoBehaviour
 
     void Update()
     {
+        // Check attack input
         if (attackAction.WasPressedThisFrame())
         {
             OnAttackClicked();
         }
 
+        // Check combo timeout
         if (isAttacking && Time.time - lastClickTime > comboWindow)
         {
             ResetCombo();
@@ -37,6 +38,7 @@ public class KatanaComboSystem : MonoBehaviour
 
     void OnAttackClicked()
     {
+        // Record attack time
         lastClickTime = Time.time;
 
         if (!isAttacking)
@@ -45,6 +47,7 @@ public class KatanaComboSystem : MonoBehaviour
             comboStep = 0;
             PlayAttack();
         }
+        // Continue combo
         else if (Time.time - lastClickTime < comboWindow)
         {
             comboStep++;
@@ -58,6 +61,7 @@ public class KatanaComboSystem : MonoBehaviour
         anim.SetBool("isAttacking", true);
         anim.SetInteger("ComboAttack", comboStep);
 
+        // Play attack animation
         anim.Play("katana" + (comboStep + 1), 0, 0f);
 
         DetecterEnnemis();
@@ -65,14 +69,17 @@ public class KatanaComboSystem : MonoBehaviour
 
     void DetecterEnnemis()
     {
+        // Find enemies in range
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, portee);
         Transform closestEnemyTransform = null;
         float closestDistance = float.MaxValue;
 
+        // Check all colliders
         foreach (var hit in hits)
         {
             if (hit.CompareTag("Enemy"))
             {
+                // Calculate distance
                 float distance = Vector2.Distance(transform.position, hit.transform.position);
                 if (distance < closestDistance)
                 {
@@ -94,6 +101,7 @@ public class KatanaComboSystem : MonoBehaviour
 
     void ResetCombo()
     {
+        // Reset combo state
         isAttacking = false;
         comboStep = 0;
         anim.SetBool("isAttacking", false);

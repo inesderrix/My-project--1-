@@ -20,6 +20,7 @@ public class EnemySpawner : MonoBehaviour
     
     void Start()
     {
+        // Find player reference
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         prochainSpawn = Time.time + tempsEntreVagues;
         
@@ -29,6 +30,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if (Time.time >= prochainSpawn && !vagueEnCours && GetNombreEnnemis() < maxEnnemis)
         {
+            // Start spawning wave
             StartCoroutine(SpawnVague());
             prochainSpawn = Time.time + tempsEntreVagues;
         }
@@ -41,7 +43,6 @@ public class EnemySpawner : MonoBehaviour
         int ennemisActuels = GetNombreEnnemis();
         int ennemisASpawner = Mathf.Min(ennemisParVague, maxEnnemis - ennemisActuels);
         
-        
         for (int i = 0; i < ennemisASpawner; i++)
         {
             SpawnEnnemi();
@@ -53,6 +54,9 @@ public class EnemySpawner : MonoBehaviour
     
     void SpawnEnnemi()
     {
+        if (enemyPrefab == null) return;
+        
+        // Get random spawn position
         Vector3 positionSpawn = GetPositionSpawnAleatoire();
         GameObject nouvelEnnemi = Instantiate(enemyPrefab, positionSpawn, Quaternion.identity);
         
@@ -60,6 +64,7 @@ public class EnemySpawner : MonoBehaviour
     
     Vector3 GetPositionSpawnAleatoire()
     {
+        // Try find valid position
         Vector3 position;
         int tentatives = 0;
         const int maxTentatives = 50;

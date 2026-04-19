@@ -40,6 +40,10 @@ public class KatanaComboSystem : MonoBehaviour
     {
         // Record attack time
         lastClickTime = Time.time;
+        
+        // Get attack direction first to check if combo allowed
+        Vector2 attackDir = GetAttackDirection();
+        bool isVertical = Mathf.Abs(attackDir.y) > Mathf.Abs(attackDir.x);
 
         if (!isAttacking)
         {
@@ -47,8 +51,8 @@ public class KatanaComboSystem : MonoBehaviour
             comboStep = 0;
             PlayAttack();
         }
-        // Continue combo
-        else if (Time.time - lastClickTime < comboWindow)
+        // Continue combo (only for horizontal attacks)
+        else if (Time.time - lastClickTime < comboWindow && !isVertical)
         {
             comboStep++;
             if (comboStep > 2) comboStep = 0;
@@ -60,14 +64,53 @@ public class KatanaComboSystem : MonoBehaviour
     {
         anim.SetBool("isAttacking", true);
         anim.SetInteger("ComboAttack", comboStep);
+        
+        Vector2 attackDirection = GetAttackDirection();
 
-        // Play attack animation
-        anim.Play("katana" + (comboStep + 1), 0, 0f);
+        string animName = GetAttackAnimationName(attackDirection, comboStep);
+        anim.Play(animName, 0, 0f);
 
-        DetecterEnnemis();
+        DetecterEnnemisAvecDirection(attackDirection);
+    }
+    
+    Vector2 GetAttackDirection()
+    {
+        PlayerMouvement movement = GetComponent<PlayerMouvement>();
+        if (movement != null)
+        {
+            return movement.GetFacingDirection();
+        }
+        
+        // Default to facing right
+        return Vector2.right;
+    }
+    
+    string GetAttackAnimationName(Vector2 direction, int combo)
+    {
+        float absX = Mathf.Abs(direction.x);
+        float absY = Mathf.Abs(direction.y);
+        
+        if (absY > absX)
+        {
+            // Vertical attacks - no combo
+            if (direction.y > 0)
+            {
+                return "vert-katana-up";
+            }
+            else
+            {
+                return "vert-katana";
+            }
+        }
+        else
+        {
+            // Horizontal attack - full combo
+            string suffix = (combo + 1).ToString();
+            return "katana" + suffix;
+        }
     }
 
-    void DetecterEnnemis()
+    void DetecterEnnemisAvecDirection(Vector2 attackDir)
     {
         // Find enemies in range
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, portee);
@@ -79,12 +122,19 @@ public class KatanaComboSystem : MonoBehaviour
         {
             if (hit.CompareTag("Enemy"))
             {
-                // Calculate distance
-                float distance = Vector2.Distance(transform.position, hit.transform.position);
-                if (distance < closestDistance)
+                // Check if enemy is in attack direction
+                Vector2 toEnemy = (hit.transform.position - transform.position).normalized;
+                float dotProduct = Vector2.Dot(toEnemy, attackDir);
+                
+                // Only hit enemies in front (dot > 0.5 = within 60 degrees)
+                if (dotProduct > 0.5f)
                 {
-                    closestDistance = distance;
-                    closestEnemyTransform = hit.transform;
+                    float distance = Vector2.Distance(transform.position, hit.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestEnemyTransform = hit.transform;
+                    }
                 }
             }
         }

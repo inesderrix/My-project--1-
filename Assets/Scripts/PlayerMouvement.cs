@@ -12,6 +12,7 @@ public class PlayerMouvement : MonoBehaviour
     private Animator animator;
     private float dernierHorizontal = 0f;
     private Vector2 moveInput;
+    private Vector2 lastMoveDirection;
 
     private PlayerInput playerInput;
     private InputAction moveAction;
@@ -19,6 +20,9 @@ public class PlayerMouvement : MonoBehaviour
 
     void Start()
     {
+        // Initialize input to zero
+        moveInput = Vector2.zero;
+        
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null)
         {
@@ -43,9 +47,18 @@ public class PlayerMouvement : MonoBehaviour
             moveInput = moveAction.ReadValue<Vector2>();
         }
 
-        // Move character
-        DeplacerPersonnage();
-        // Flip sprite direction
+        if (moveInput.magnitude > 0.1f)
+        {
+            // Store last direction for attack animations
+            lastMoveDirection = moveInput.normalized;
+            DeplacerPersonnage();
+            UpdateDirectionalAnimations();
+        }
+        else
+        {
+            UpdateIdleAnimation();
+        }
+        
         FlipSprite();
     }
 
@@ -70,8 +83,7 @@ public class PlayerMouvement : MonoBehaviour
 
         if (animator != null)
         {
-            bool isMoving = moveInput.magnitude > 0.1f;
-            animator.SetBool("isMoving", isMoving);
+            animator.SetBool("isMoving", true);
         }
     }
 
@@ -82,5 +94,46 @@ public class PlayerMouvement : MonoBehaviour
         {
             spriteRenderer.flipX = dernierHorizontal < 0;
         }
+    }
+    
+    void UpdateDirectionalAnimations()
+    {
+        if (animator == null) return;
+        
+        // Determine direction
+        float absX = Mathf.Abs(moveInput.x);
+        float absY = Mathf.Abs(moveInput.y);
+        
+        // Send Direction parameter to animator
+        // 0 = down (run-vert), 1 = up (run-vert-up), 2 = horizontal (run-hor)
+        if (absY > absX)
+        {
+            if (moveInput.y > 0)
+            {
+                animator.SetInteger("Direction", 1);
+            }
+            else
+            {
+                animator.SetInteger("Direction", 0);
+            }
+        }
+        else
+        {
+            animator.SetInteger("Direction", 2);
+        }
+        
+        animator.SetBool("isMoving", true);
+    }
+    
+    void UpdateIdleAnimation()
+    {
+        if (animator == null) return;
+        
+        animator.SetBool("isMoving", false);
+    }
+    
+    public Vector2 GetFacingDirection()
+    {
+        return lastMoveDirection.magnitude > 0.1f ? lastMoveDirection : new Vector2(dernierHorizontal, 0);
     }
 }

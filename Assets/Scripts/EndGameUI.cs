@@ -61,13 +61,13 @@ public class EndGameUI : MonoBehaviour
         
         if (messageText != null)
         {
-            messageText.text = "Félicitations! Vous avez éliminé 30 ennemis!";
+            messageText.text = "Félicitations! Vous avez éliminé 20 ennemis!";
             messageText.color = Color.white;
         }
         
         if (statsText != null && GameManager.Instance != null)
         {
-            statsText.text = $"Ennemis tués: {GameManager.Instance.GetEnemiesKilled()}/30";
+            statsText.text = $"Ennemis tués: {GameManager.Instance.GetEnemiesKilled()}/20";
             statsText.color = Color.green;
         }
     }
@@ -88,7 +88,7 @@ public class EndGameUI : MonoBehaviour
         
         if (statsText != null && GameManager.Instance != null)
         {
-            statsText.text = $"Ennemis tués: {GameManager.Instance.GetEnemiesKilled()}/30";
+            statsText.text = $"Ennemis tués: {GameManager.Instance.GetEnemiesKilled()}/20";
             statsText.color = Color.gray;
         }
         

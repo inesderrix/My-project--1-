@@ -5399,7 +5399,7 @@ BoxCollider2D:
   m_Offset: {x: 0.0006634742, y: -0.03237441}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.25, y: 0.5}
     oldSize: {x: 1.8402528, y: 1.8285714}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
@@ -6926,7 +6926,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   enemiesKilled: 0
-  enemiesToWin: 30
+  enemiesToWin: 20
   defeatSceneIndex: 2
   victorySceneIndex: 3
 --- !u!4 &1646796445
@@ -7369,10 +7369,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 2192980994578207249, guid: d20cb0033331293489c74b27877aa4f1, type: 3}
-  ennemisParVague: 3
+  ennemisParVague: 2
   tempsEntreVagues: 5
-  delaiEntreEnnemis: 0.5
-  maxEnnemis: 15
+  delaiEntreEnnemis: 1
+  maxEnnemis: 8
   rayonSpawn: 10
   distanceMinJoueur: 8
 --- !u!4 &1903576735
